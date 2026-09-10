@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Shea Butter Experience"
+description = "A cinematic, scroll-driven brand website for a premium shea butter brand, featuring an interactive 3D product moment, tactile storytelling, and responsive motion designed for discovery and conversion."
+version = "1.0.0"
+id = "artifacts/shea-butter-experience"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19392
+
+[services.development]
+run = "pnpm --filter @workspace/shea-butter-experience run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/shea-butter-experience", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/shea-butter-experience/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19392"
+BASE_PATH = "/"
