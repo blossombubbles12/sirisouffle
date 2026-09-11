@@ -3,14 +3,19 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { ScrollProductViewer } from '@/components/ScrollProductViewer';
 import NotFound from '@/pages/not-found';
 import { ArrowDown, ArrowUpRight, ChevronDown, CircleCheck, Droplets, Instagram, Leaf, Menu, Minus, Move3d, Plus, ShoppingBag, Sparkles, Sun, X } from 'lucide-react';
-import { Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
+import { Link, Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
 import * as THREE from 'three';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 const queryClient = new QueryClient();
+const productFrames = Array.from(
+  { length: 220 },
+  (_, index) => `/product-frames/frame_${String(index).padStart(3, '0')}.webp`,
+);
 
 function ProductCanvas() {
   const mountRef = useRef<HTMLDivElement>(null);
@@ -144,6 +149,10 @@ function Header({ onBag }: { onBag: () => void }) {
           {nav.map((item) => <a key={item} href={`#${item}`} className="focus-ring eyebrow text-[#394a35]/75 transition-colors hover:text-[#394a35]" data-testid={`link-nav-${item}`}>{item}</a>)}
         </nav>
         <div className="flex items-center gap-3">
+          <Link href="/product" className="focus-ring hidden items-center gap-2 text-[#394a35]/75 transition hover:text-[#394a35] md:inline-flex" data-testid="link-nav-product">
+            <span className="eyebrow !text-[9px]">view product</span>
+            <ArrowUpRight size={14} />
+          </Link>
           <button onClick={onBag} className="focus-ring group relative flex items-center gap-2 rounded-full border border-[#394a35]/25 px-4 py-2.5 text-[#394a35] transition hover:bg-[#394a35] hover:text-[#f5eddc]" data-testid="button-open-bag">
             <ShoppingBag size={15} strokeWidth={1.7} />
             <span className="eyebrow !text-[9px]">ritual bag</span>
@@ -155,6 +164,7 @@ function Header({ onBag }: { onBag: () => void }) {
       </div>
       {menuOpen && <nav className="mx-5 grid gap-1 rounded-2xl border border-[#394a35]/15 bg-[#f5eddc]/95 p-3 shadow-xl backdrop-blur md:hidden" aria-label="Mobile navigation">
         {nav.map((item) => <a onClick={() => setMenuOpen(false)} key={item} href={`#${item}`} className="rounded-xl px-4 py-3 text-sm capitalize text-[#394a35] hover:bg-[#e9dec9]" data-testid={`link-mobile-${item}`}>{item}</a>)}
+        <Link onClick={() => setMenuOpen(false)} href="/product" className="rounded-xl px-4 py-3 text-sm capitalize text-[#394a35] hover:bg-[#e9dec9]" data-testid="link-mobile-product">view product</Link>
       </nav>}
     </header>
   );
@@ -320,8 +330,96 @@ function Home() {
   );
 }
 
+function ProductPage() {
+  useEffect(() => {
+    const previousTitle = document.title;
+    document.title = 'The Butterscotch Jar — SiriSoufflé';
+    return () => {
+      document.title = previousTitle;
+    };
+  }, []);
+
+  return (
+    <div className="grain min-h-[100dvh] bg-[#f5eddc] text-[#394a35]">
+      <header className="relative z-30">
+        <div className="mx-auto flex max-w-[1440px] items-center justify-between px-5 py-5 md:px-10 md:py-7">
+          <Link href="/" className="focus-ring flex items-center gap-2" data-testid="link-product-brand">
+            <span className="display text-[26px] leading-none tracking-[-.06em]">NŌR</span>
+            <span className="mt-1 text-[10px] font-medium tracking-[.2em] text-[#d7a35f]">/ SHEA</span>
+          </Link>
+          <Link
+            href="/"
+            className="focus-ring inline-flex items-center gap-2 rounded-full border border-[#394a35]/25 px-4 py-2.5 text-[#394a35] transition hover:bg-[#394a35] hover:text-[#f5eddc]"
+            data-testid="link-product-back"
+          >
+            <ArrowUpRight size={15} className="rotate-[270deg]" />
+            <span className="eyebrow !text-[9px]">back to the story</span>
+          </Link>
+        </div>
+      </header>
+
+      <main>
+        <section className="mx-auto max-w-[1440px] px-5 pb-6 pt-16 md:px-10 md:pb-10 md:pt-24">
+          <div className="grid gap-8 md:grid-cols-[1fr_auto] md:items-end">
+            <div>
+              <div className="eyebrow flex items-center gap-3 text-[#52634b]/75">
+                <span>the product, up close</span>
+                <span className="h-px w-10 bg-[#52634b]/50" />
+                <span>01 / 01</span>
+              </div>
+              <h1 className="display mt-6 max-w-[830px] text-[clamp(4.3rem,11vw,10rem)] leading-[.78]">
+                Meet the
+                <br />
+                <em className="text-[#c87046]">butterscotch.</em>
+              </h1>
+            </div>
+            <p className="max-w-[260px] pb-1 text-sm leading-[1.7] text-[#52634b]/75 md:text-right">
+              One jar, seen from every angle. Scroll slowly to move from front label to whipped top.
+            </p>
+          </div>
+        </section>
+
+        <ScrollProductViewer frames={productFrames} label="scroll to turn the jar" />
+
+        <section className="border-t border-[#394a35]/15 bg-[#e2cfab] px-5 py-20 md:px-10 md:py-28">
+          <div className="mx-auto grid max-w-[1180px] gap-12 md:grid-cols-[.8fr_1.2fr] md:items-end">
+            <div>
+              <span className="eyebrow text-[#52634b]/75">the daily butter</span>
+              <h2 className="display mt-6 max-w-[600px] text-[clamp(3.5rem,7vw,7rem)] leading-[.82]">
+                Warm skin.
+                <br />
+                <em className="text-[#c87046]">Slow hands.</em>
+              </h2>
+            </div>
+            <div className="grid gap-6 text-sm leading-[1.7] text-[#52634b]/80 md:grid-cols-2">
+              <p>Whipped shea with a soft butterscotch finish. Made to melt between your palms and disappear into damp skin.</p>
+              <p>120g of uncomplicated care, prepared in small batches and kept close for whenever your body asks for more.</p>
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-[#394a35] px-5 py-16 text-[#f5eddc] md:px-10 md:py-20">
+          <div className="mx-auto flex max-w-[1180px] flex-col justify-between gap-8 md:flex-row md:items-center">
+            <div>
+              <span className="eyebrow text-[#d7a35f]">siri soufflé · butterscotch</span>
+              <p className="display mt-3 text-4xl">Keep this ritual close.</p>
+            </div>
+            <Link
+              href="/"
+              className="button-sheen focus-ring inline-flex w-fit items-center gap-3 rounded-full bg-[#d7a35f] px-6 py-3.5 text-sm font-semibold text-[#394a35] transition hover:-translate-y-1"
+              data-testid="link-product-shop"
+            >
+              Return to NŌR <ArrowUpRight size={16} />
+            </Link>
+          </div>
+        </section>
+      </main>
+    </div>
+  );
+}
+
 function Router() {
-  return <RoutedErrorBoundary><Switch><Route path="/" component={Home} /><Route component={NotFound} /></Switch></RoutedErrorBoundary>;
+  return <RoutedErrorBoundary><Switch><Route path="/" component={Home} /><Route path="/product" component={ProductPage} /><Route component={NotFound} /></Switch></RoutedErrorBoundary>;
 }
 
 function RoutedErrorBoundary({ children }: { children: ReactNode }) {
