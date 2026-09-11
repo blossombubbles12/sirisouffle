@@ -220,14 +220,14 @@ export function ScrollProductViewer({
           />
           <div
             key={activePhase}
-            className="product-phase-in absolute bottom-[11%] left-5 z-30 max-w-[390px] text-[#394a35] md:bottom-[13%] md:left-[7%]"
+            className="product-phase-in absolute inset-x-4 bottom-4 z-30 rounded-[22px] border border-[#394a35]/15 bg-[#f5eddc] p-5 text-[#394a35] shadow-[0_18px_50px_rgba(57,74,53,.16)] md:bottom-[12%] md:left-[6%] md:right-auto md:max-w-[390px] md:p-6"
             aria-live="polite"
           >
             <span className="eyebrow text-[#52634b]/75">{phase.eyebrow}</span>
-            <h2 className="display mt-3 text-[clamp(2.8rem,5vw,5.5rem)] leading-[.84]">
+            <h2 className="display mt-3 text-[clamp(2.35rem,4vw,4.4rem)] leading-[.86]">
               {phase.title}
             </h2>
-            <p className="mt-5 max-w-[310px] text-sm leading-[1.65] text-[#52634b]/80">
+            <p className="mt-4 max-w-[310px] text-sm leading-[1.6] text-[#52634b]/80">
               {phase.body}
             </p>
             <a
