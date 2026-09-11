@@ -1,11 +1,21 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ArrowUpRight } from 'lucide-react';
 
 export interface ScrollProductViewerProps {
   frames: string[];
   className?: string;
   label?: string;
+  phases?: ScrollProductPhase[];
+}
+
+export interface ScrollProductPhase {
+  eyebrow: string;
+  title: string;
+  body: string;
+  ctaLabel: string;
+  ctaHref: string;
 }
 
 type FrameImage = HTMLImageElement | undefined;
@@ -30,16 +40,50 @@ function drawFrame(canvas: HTMLCanvasElement, image: HTMLImageElement) {
   context.imageSmoothingQuality = 'high';
   context.clearRect(0, 0, width, height);
 
-  const scale = Math.min(width / image.naturalWidth, height / image.naturalHeight);
+  // The source frames are 16:9. Covering the viewport removes the hard
+  // rectangle around the source background while keeping the jar centered.
+  const scale = Math.max(width / image.naturalWidth, height / image.naturalHeight);
   const drawWidth = image.naturalWidth * scale;
   const drawHeight = image.naturalHeight * scale;
   context.drawImage(image, (width - drawWidth) / 2, (height - drawHeight) / 2, drawWidth, drawHeight);
 }
 
+const defaultPhases: ScrollProductPhase[] = [
+  {
+    eyebrow: '01 / the shell',
+    title: 'A jar with nothing to hide.',
+    body: 'A deep glass silhouette, finished simply so the quality inside does the talking.',
+    ctaLabel: 'See the finish',
+    ctaHref: '#product-notes',
+  },
+  {
+    eyebrow: '02 / the texture',
+    title: 'Whipped for the slow melt.',
+    body: 'Airy, cushiony, and hand-finished — the first touch turns from balm to silk.',
+    ctaLabel: 'Feel the texture',
+    ctaHref: '#product-notes',
+  },
+  {
+    eyebrow: '03 / the ritual',
+    title: 'Richness without the weight.',
+    body: 'A small scoop warms between your palms and leaves skin soft, never crowded.',
+    ctaLabel: 'Meet the ritual',
+    ctaHref: '#product-notes',
+  },
+  {
+    eyebrow: '04 / the top view',
+    title: 'The proof is in the swirl.',
+    body: 'A slow, generous whip that keeps its shape until the moment it meets your skin.',
+    ctaLabel: 'Keep it close',
+    ctaHref: '#product-notes',
+  },
+];
+
 export function ScrollProductViewer({
   frames,
   className = '',
   label = 'Scroll to explore the product',
+  phases = defaultPhases,
 }: ScrollProductViewerProps) {
   const sectionRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -47,6 +91,7 @@ export function ScrollProductViewer({
   const currentFrameRef = useRef(0);
   const pendingFrameRef = useRef<number | null>(null);
   const drawRequestRef = useRef<number | null>(null);
+  const [activePhase, setActivePhase] = useState(0);
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -124,6 +169,11 @@ export function ScrollProductViewer({
         end: 'bottom bottom',
         scrub: 0.12,
         onUpdate: (self) => {
+          const nextPhase = Math.min(
+            phases.length - 1,
+            Math.floor(self.progress * phases.length),
+          );
+          setActivePhase((current) => (current === nextPhase ? current : nextPhase));
           const nextFrame = Math.min(
             frames.length - 1,
             Math.round(self.progress * (frames.length - 1)),
@@ -148,32 +198,52 @@ export function ScrollProductViewer({
       }
       imagesRef.current = [];
     };
-  }, [frames]);
+  }, [frames, phases.length]);
+
+  const phase = phases[Math.min(activePhase, phases.length - 1)] ?? defaultPhases[0];
 
   return (
     <section
       ref={sectionRef}
-      className={`relative h-[280vh] ${className}`}
+      className={`relative h-[300vh] ${className}`}
       aria-label="Scroll-controlled product viewer"
     >
-      <div className="sticky top-0 flex h-[100svh] min-h-[620px] items-center justify-center overflow-hidden">
-        <div className="relative w-full max-w-[1180px] px-5 md:px-10">
-          <div className="pointer-events-none absolute left-1/2 top-1/2 aspect-square w-[min(72vw,760px)] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#d7a35f]/20 blur-3xl" />
-          <div className="pointer-events-none absolute bottom-[10%] left-1/2 h-8 w-[min(52vw,460px)] -translate-x-1/2 rounded-[50%] bg-[#4c382c]/20 blur-2xl" />
+      <div className="sticky top-0 flex h-[100svh] min-h-[620px] items-center justify-center overflow-hidden bg-[#f5eddc]">
+        <div className="relative h-full w-full">
+          <div className="pointer-events-none absolute inset-0 z-20 bg-[#f5eddc]/10 mix-blend-color" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-[38%] bg-gradient-to-t from-[#f5eddc]/80 via-[#f5eddc]/20 to-transparent" />
           <canvas
             ref={canvasRef}
-            className="relative z-10 mx-auto aspect-[16/9] w-full"
+            className="relative z-10 h-full w-full mix-blend-multiply"
             role="img"
             aria-label={label}
           />
-          <div className="pointer-events-none absolute bottom-3 left-1/2 z-20 -translate-x-1/2 whitespace-nowrap text-center text-[#394a35]/65">
+          <div
+            key={activePhase}
+            className="product-phase-in absolute bottom-[11%] left-5 z-30 max-w-[390px] text-[#394a35] md:bottom-[13%] md:left-[7%]"
+            aria-live="polite"
+          >
+            <span className="eyebrow text-[#52634b]/75">{phase.eyebrow}</span>
+            <h2 className="display mt-3 text-[clamp(2.8rem,5vw,5.5rem)] leading-[.84]">
+              {phase.title}
+            </h2>
+            <p className="mt-5 max-w-[310px] text-sm leading-[1.65] text-[#52634b]/80">
+              {phase.body}
+            </p>
+            <a
+              href={phase.ctaHref}
+              className="button-sheen focus-ring mt-6 inline-flex items-center gap-3 rounded-full bg-[#394a35] px-5 py-3 text-xs font-semibold text-[#f5eddc] transition hover:-translate-y-1"
+            >
+              {phase.ctaLabel}
+              <ArrowUpRight size={14} />
+            </a>
+          </div>
+          <div className="pointer-events-none absolute right-5 top-[8%] z-30 text-right text-[#394a35]/55 md:right-[7%]">
             <span className="eyebrow !text-[9px]">
               <span className="mr-2 inline-block h-1.5 w-1.5 rounded-full bg-[#c87046] align-middle" />
               {label}
             </span>
-          </div>
-          <div className="pointer-events-none absolute left-1/2 top-[7%] z-20 -translate-x-1/2 text-center text-[#394a35]/45">
-            <span className="font-mono text-[10px] tracking-[.2em]">01 — 220</span>
+            <span className="mt-3 block font-mono text-[10px] tracking-[.2em]">01 — 220</span>
           </div>
         </div>
       </div>

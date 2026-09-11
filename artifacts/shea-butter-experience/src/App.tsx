@@ -379,9 +379,42 @@ function ProductPage() {
           </div>
         </section>
 
-        <ScrollProductViewer frames={productFrames} label="scroll to turn the jar" />
+        <ScrollProductViewer
+          frames={productFrames}
+          label="scroll to turn the jar"
+          phases={[
+            {
+              eyebrow: '01 / the shell',
+              title: 'A jar with nothing to hide.',
+              body: 'A deep glass silhouette, finished simply so the quality inside does the talking.',
+              ctaLabel: 'See the finish',
+              ctaHref: '#product-notes',
+            },
+            {
+              eyebrow: '02 / the texture',
+              title: 'Whipped for the slow melt.',
+              body: 'Airy, cushiony, and hand-finished — the first touch turns from balm to silk.',
+              ctaLabel: 'Feel the texture',
+              ctaHref: '#product-notes',
+            },
+            {
+              eyebrow: '03 / the ritual',
+              title: 'Richness without the weight.',
+              body: 'A small scoop warms between your palms and leaves skin soft, never crowded.',
+              ctaLabel: 'Meet the ritual',
+              ctaHref: '#product-notes',
+            },
+            {
+              eyebrow: '04 / the top view',
+              title: 'The proof is in the swirl.',
+              body: 'A slow, generous whip that keeps its shape until the moment it meets your skin.',
+              ctaLabel: 'Keep it close',
+              ctaHref: '#product-notes',
+            },
+          ]}
+        />
 
-        <section className="border-t border-[#394a35]/15 bg-[#e2cfab] px-5 py-20 md:px-10 md:py-28">
+        <section id="product-notes" className="border-t border-[#394a35]/15 bg-[#e2cfab] px-5 py-20 md:px-10 md:py-28">
           <div className="mx-auto grid max-w-[1180px] gap-12 md:grid-cols-[.8fr_1.2fr] md:items-end">
             <div>
               <span className="eyebrow text-[#52634b]/75">the daily butter</span>
